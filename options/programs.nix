@@ -19,18 +19,19 @@ in {
   };
 
   config = (mkMerge [
-    ((mkIf cfg.direnv.enable) {
-      home-manager.users.${username} = {
-        home.packages = [ cfg.direnv.package ];
-      };
-    })
+    ((mkIf cfg.direnv.enable) mkMerge [
+      {
+        home-manager.users.${username} = {
+          home.packages = [ cfg.direnv.package ];
+        };
+      }
+      (mkIf (shellCfg.package.pname == "zsh") {
+        dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
+      })
 
-    (mkIf (shellCfg.package.pname == "zsh") {
-      dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
-    })
-    
-    (mkIf (shellCfg.package.pname == "nushell") {
-      dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
-    })
+      (mkIf (shellCfg.package.pname == "nushell") {
+        dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
+      })
+    ])
   ]);
 }
