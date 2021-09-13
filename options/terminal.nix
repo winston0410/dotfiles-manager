@@ -24,6 +24,7 @@ let
 
   shellDefaultConfig = {
     enable = false;
+    aliases = { };
     # package = pkgs.zsh;
     # configPath = ../dotfiles/.zshrc;
   };
@@ -41,6 +42,11 @@ let
   };
 
   cfg = config.dotfiles.terminal;
+
+  aliasList =
+    (mapAttrsToList (k: v: "alias ${k}=${escapeShellArg v}") cfg.shell.aliases);
+
+  tomlFormat = pkgs.formats.toml { };
 in {
   options.dotfiles.terminal = {
     windowManager = mkOption {
@@ -54,8 +60,13 @@ in {
     };
     shell = mkOption {
       type = types.submodule {
-        options = (lib.recursiveUpdate { enable = mkEnableOption "shell"; }
-          programConfig);
+        options = (lib.recursiveUpdate {
+          enable = mkEnableOption "shell";
+          aliases = mkOption {
+            description = "Shell aliases that will be used by all shells";
+            type = types.attrsOf types.str;
+          };
+        } programConfig);
       };
       default = shellDefaultConfig;
       description = "Configuration for shell";
@@ -119,13 +130,22 @@ in {
 
         home.file = mkMerge [
           (mkIf (cfg.shell.package.pname == "zsh") {
-            ".zshrc" = { source = cfg.shell.configPath; };
+            ".zshrc" = {
+              text = (builtins.readFile cfg.shell.configPath) + ''
+                ${(concatStringsSep "\n" aliasList)}
+              '';
+            };
           })
         ];
 
-        xdg.configFile = mkMerge [
+        xdg.configFile = let nushellExtra = { startup = aliasList; };
+        in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
-            "nu/config.toml" = { source = cfg.shell.configPath; };
+            "nu/config.toml" = {
+              text = (builtins.readFile cfg.shell.configPath) + ''
+                ${tomlFormat.generate "nushell-config" nushellExtra}
+              '';
+            };
           })
         ];
       };
