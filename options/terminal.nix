@@ -91,8 +91,20 @@ in {
   };
 
   config = (mkMerge [
-    # (mkIf (not cfg.windowManager.enable) abort
-    # (config.lib.custom.addErrPrefix "You haven't defined any window manager."))
+    {
+      assertions = [
+        {
+          assertion = !cfg.shell.enable;
+          message =
+            config.lib.custom.addErrPrefix "You haven't defined any shell.";
+        }
+        {
+          assertion = !cfg.emulator.enable;
+          message =
+            config.lib.custom.addErrPrefix "You haven't defined any terminal emulator.";
+        }
+      ];
+    }
 
     ((mkIf cfg.windowManager.enable) {
       services.xserver = {
@@ -118,9 +130,6 @@ in {
         ];
       };
     })
-
-    # (mkIf (not cfg.shell.enable) abort
-    # (config.lib.custom.addErrPrefix "You haven't defined any shell."))
 
     ((mkIf cfg.shell.enable) {
       home-manager.users.${username} = let
@@ -148,9 +157,6 @@ in {
         ];
       };
     })
-
-    # (mkIf (not cfg.emulator.enable) abort
-    # (config.lib.custom.addErrPrefix "You haven't defined any terminal."))
 
     ((mkIf cfg.emulator.enable) {
       home-manager.users.${username} = let

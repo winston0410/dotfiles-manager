@@ -16,7 +16,6 @@
         let list = (builtins.map (m: (m username)) moduleList);
         in {
           imports = [
-            home-manager.nixosModules.home-manager
             ((import ./options.nix) username)
           ] ++ list;
           home-manager.useGlobalPkgs = true;
