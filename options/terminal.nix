@@ -25,6 +25,7 @@ let
   shellDefaultConfig = {
     enable = false;
     aliases = { };
+    init = "";
     # package = pkgs.zsh;
     # configPath = ../dotfiles/.zshrc;
   };
@@ -67,7 +68,6 @@ in {
             type = types.attrsOf types.str;
           };
           init = mkOption {
-            default = "";
             type = types.lines;
             description = "Extra command for shell";
           };
@@ -156,11 +156,11 @@ in {
         ];
 
         xdg.configFile = let
-          initCommands = lib.strings.splitString "\n" cfg.shell.init;
+          # initCommands = lib.strings.splitString "\n" cfg.shell.init;
           nushellExtra = {
             startup =
-              (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases)
-              ++ initCommands;
+              (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases);
+              # ++ initCommands;
           };
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
