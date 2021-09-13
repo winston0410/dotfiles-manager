@@ -136,7 +136,10 @@ in {
       in {
         home.packages = [ cfg.shell.package ];
 
-        home.file = mkMerge [
+        home.file = let
+          aliasList = (mapAttrsToList (k: v: "alias ${k}=${escapeShellArg v}")
+            cfg.shell.aliases);
+        in mkMerge [
           (mkIf (cfg.shell.package.pname == "zsh") {
             ".zshrc" = {
               text = (builtins.readFile cfg.shell.configPath) + ''
@@ -146,7 +149,11 @@ in {
           })
         ];
 
-        xdg.configFile = let nushellExtra = { startup = aliasList; };
+        xdg.configFile = let
+          nushellExtra = {
+            startup =
+              (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases);
+          };
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
             "nu/config.toml" = {
