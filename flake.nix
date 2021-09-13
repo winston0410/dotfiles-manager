@@ -15,12 +15,12 @@
       createProfile = moduleList: username:
         let list = (builtins.map (m: (m username)) moduleList);
         in {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
           imports = [
             home-manager.nixosModules.home-manager
             ((import ./options.nix) username)
           ] ++ list;
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
         };
     };
 
