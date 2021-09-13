@@ -123,7 +123,6 @@ in {
     # (config.lib.custom.addErrPrefix "You haven't defined any shell."))
 
     ((mkIf cfg.shell.enable) {
-      # Hardcode right now. Not sure how to solve it
       home-manager.users.${username} = let
       in {
         home.packages = [ cfg.shell.package ];
@@ -142,9 +141,8 @@ in {
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
             "nu/config.toml" = {
-              text = (builtins.readFile cfg.shell.configPath) + ''
-                ${tomlFormat.generate "nushell-config" nushellExtra}
-              '';
+              # TODO: Handle shellAlias for nushell
+              text = (builtins.readFile cfg.shell.configPath);
             };
           })
         ];
