@@ -150,7 +150,7 @@ in {
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
             "nu/config.toml" = {
-              text = tomlFormat.generate "nushell-config"
+              source = tomlFormat.generate "nushell-config"
                 (lib.attrsets.recursiveUpdate
                   (builtins.trivial.importTOML cfg.shell.configPath)
                   nushellExtra);
