@@ -11,7 +11,8 @@
 
   outputs = { nixpkgs, home-manager, ... }: rec {
     lib = {
-      createUserProfile = username: moduleList:
+      # username as last argument for easier partial application
+      createUserProfile = moduleList: username:
         let list = (builtins.map (m: (m username)) moduleList);
         in {
           home-manager.useGlobalPkgs = true;
