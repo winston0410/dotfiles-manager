@@ -94,12 +94,12 @@ in {
     {
       assertions = [
         {
-          assertion = !cfg.shell.enable;
+          assertion = cfg.shell.enable;
           message =
             config.lib.custom.addErrPrefix "You haven't defined any shell.";
         }
         {
-          assertion = !cfg.emulator.enable;
+          assertion = cfg.emulator.enable;
           message = config.lib.custom.addErrPrefix
             "You haven't defined any terminal emulator.";
         }
