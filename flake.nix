@@ -17,7 +17,10 @@
         in {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          imports = [ ((import ./options.nix) username) ] ++ list;
+          imports = [
+            home-manager.nixosModules.home-manager
+            ((import ./options.nix) username)
+          ] ++ list;
         };
     };
 
