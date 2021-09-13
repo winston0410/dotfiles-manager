@@ -66,6 +66,11 @@ in {
             description = "Shell aliases that will be used by all shells";
             type = types.attrsOf types.str;
           };
+          init = mkOption {
+            default = "";
+            type = types.lines;
+            description = "Extra command for shell";
+          };
         } programConfig);
       };
       default = shellDefaultConfig;
@@ -144,15 +149,18 @@ in {
             ".zshrc" = {
               text = (builtins.readFile cfg.shell.configPath) + ''
                 ${(concatStringsSep "\n" aliasList)}
+                ${cfg.shell.init}
               '';
             };
           })
         ];
 
         xdg.configFile = let
+          initCommands = lib.strings.splitString "\n" cfg.shell.init;
           nushellExtra = {
             startup =
-              (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases);
+              (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases)
+              ++ initCommands;
           };
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
