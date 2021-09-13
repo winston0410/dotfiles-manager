@@ -100,8 +100,8 @@ in {
         }
         {
           assertion = !cfg.emulator.enable;
-          message =
-            config.lib.custom.addErrPrefix "You haven't defined any terminal emulator.";
+          message = config.lib.custom.addErrPrefix
+            "You haven't defined any terminal emulator.";
         }
       ];
     }
@@ -150,8 +150,10 @@ in {
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
             "nu/config.toml" = {
-              # TODO: Handle shellAlias for nushell
-              text = (builtins.readFile cfg.shell.configPath);
+              text = tomlFormat.generate "nushell-config"
+                (lib.attrsets.recursiveUpdate
+                  (builtins.trivial.importTOML cfg.shell.configPath)
+                  nushellExtra);
             };
           })
         ];
