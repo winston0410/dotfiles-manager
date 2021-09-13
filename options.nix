@@ -4,7 +4,7 @@ username:
 with lib;
 
 {
-  imports = (lib.lists.forEach [ ./options/terminal.nix ]
+  imports = (lib.lists.forEach [ ./options/terminal.nix ./options/programs.nix]
     (module: (import module) username));
 
   config.lib.custom = let
