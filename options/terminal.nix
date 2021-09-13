@@ -149,12 +149,12 @@ in {
         xdg.configFile = let nushellExtra = { startup = aliasList; };
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
-            # "nu/config.toml" = {
-              # source = tomlFormat.generate "nushell-config" nushellExtra;
-              # (lib.attrsets.recursiveUpdate
-              # (builtins.trivial.importTOML cfg.shell.configPath)
-              # nushellExtra);
-            # };
+            "nu/config.toml" = {
+              source = tomlFormat.generate "nushell-config"
+                (lib.attrsets.recursiveUpdate
+                  (builtins.trivial.importTOML cfg.shell.configPath)
+                  nushellExtra);
+            };
           })
         ];
       };
