@@ -152,8 +152,7 @@ in {
             "nu/config.toml" = {
               source = tomlFormat.generate "nushell-config"
                 (lib.attrsets.recursiveUpdate
-                  (builtins.trivial.importTOML cfg.shell.configPath)
-                  nushellExtra);
+                  (lib.trivial.importTOML cfg.shell.configPath) nushellExtra);
             };
           })
         ];
