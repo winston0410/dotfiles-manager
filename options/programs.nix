@@ -36,21 +36,17 @@ in {
       dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
     }))
 
-    (mkIf cfg.zoxide.enable {
+    (mkIf cfg.zoxide.enable (let
+      configDict = {
+        zsh =
+          ''eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+      };
+    in {
       home-manager.users.${username} = {
         home.packages = [ cfg.zoxide.package ];
       };
 
-      # dotfiles.terminal.shell = (mkMerge [
-      # (mkIf (shellCfg.package.pname == "zsh") {
-      # init = ''
-      # eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
-      # })
-      # (mkIf (shellCfg.package.pname == "nushell") {
-      # init = ''
-      # eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
-      # })
-      # ]);
-    })
+      dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
+    }))
   ]);
 }
