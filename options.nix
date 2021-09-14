@@ -4,8 +4,11 @@ username:
 with lib;
 
 {
-  imports = (lib.lists.forEach [ ./options/terminal.nix ./options/programs.nix]
-    (module: (import module) username));
+  imports = (lib.lists.forEach [
+    ./options/terminal.nix
+    ./options/programs.nix
+    ./options/xserver.nix
+  ] (module: (import module) username));
 
   config.lib.custom = let
     # Make this function private
