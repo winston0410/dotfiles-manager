@@ -47,6 +47,8 @@ in {
       };
 
       dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
+
+      dotfiles.terminal.shell.aliases = { z = "zoxide"; };
     }))
   ]);
 }
