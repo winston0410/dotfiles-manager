@@ -21,38 +21,42 @@ in {
   };
 
   config = (mkMerge [
-    ((mkIf cfg.direnv.enable) mkMerge [
-      {
-        home-manager.users.${username} = {
-          home.packages = [ cfg.direnv.package ];
-        };
-      }
-      (mkIf (shellCfg.package.pname == "zsh") {
-        dotfiles.terminal.shell.init = ''
-          eval "$(${
-            config.lib.custom.getBinPath cfg.direnv.package
-          } hook zsh)"'';
-      })
+    (mkIf cfg.direnv.enable {
+      home-manager.users.${username} = {
+        home.packages = [ cfg.direnv.package ];
+      };
 
-      # (mkIf (shellCfg.package.pname == "nushell") {
-      # dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
-      # })
-    ])
+      dotfiles.terminal.shell = (mkMerge [
+        (mkIf (shellCfg.package.pname == "zsh") {
+          init = ''
+            eval "$(${
+              config.lib.custom.getBinPath cfg.direnv.package
+            } hook zsh)"'';
+        })
+        (mkIf (shellCfg.package.pname == "nushell") {
+          init = ''
+            eval "$(${
+              config.lib.custom.getBinPath cfg.direnv.package
+            } hook zsh)"'';
+        })
+      ]);
+    })
 
-    ((mkIf cfg.zoxide.enable) mkMerge [
-      {
-        home-manager.users.${username} = {
-          home.packages = [ cfg.zoxide.package ];
-        };
-      }
-      (mkIf (shellCfg.package.pname == "zsh") {
-        dotfiles.terminal.shell.init =
-          ''eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
-      })
+    (mkIf cfg.zoxide.enable {
+      home-manager.users.${username} = {
+        home.packages = [ cfg.zoxide.package ];
+      };
 
-      # (mkIf (shellCfg.package.pname == "nushell") {
-      # dotfiles.terminal.shell.init = ''eval "$(direnv hook zsh)"'';
-      # })
-    ])
+      dotfiles.terminal.shell = (mkMerge [
+        (mkIf (shellCfg.package.pname == "zsh") {
+          init = ''
+            eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+        })
+        (mkIf (shellCfg.package.pname == "nushell") {
+          init = ''
+            eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+        })
+      ]);
+    })
   ]);
 }
