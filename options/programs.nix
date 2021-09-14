@@ -25,7 +25,7 @@ in {
       configDict = {
         zsh = ''
           eval "$(${
-            config.lib.custom.getBinPath cfg.direnv.package
+            config.lib.custom.getExecPath cfg.direnv.package
           } hook zsh)"'';
       };
     in {
@@ -39,7 +39,7 @@ in {
     (mkIf cfg.zoxide.enable (let
       configDict = {
         zsh =
-          ''eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+          ''eval "$(${config.lib.custom.getExecPath cfg.zoxide.package} zsh)"'';
       };
     in {
       home-manager.users.${username} = {
