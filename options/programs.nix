@@ -38,8 +38,10 @@ in {
 
     (mkIf cfg.zoxide.enable (let
       configDict = {
-        zsh =
-          ''eval "$(${config.lib.custom.getExecPath cfg.zoxide.package} zsh)"'';
+        zsh = ''
+          eval "$(${
+            config.lib.custom.getExecPath cfg.zoxide.package
+          } init zsh)"'';
       };
     in {
       home-manager.users.${username} = {
