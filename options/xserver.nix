@@ -27,11 +27,11 @@ in {
   };
 
   config = (mkIf cfg.cursor.enable (let
-    gtkCursorTheme = "";
-    gtkCursorSize = "";
+    gtkCursorTheme = ''gtk-cursor-theme-name="${cfg.cursor.theme}"'';
+    gtkCursorSize = "gtk-cursor-theme-size=${cfg.cursor.size}";
     gtkCommand = ''
       ${gtkCursorTheme}
-      ${gtkCommand}
+      ${gtkCursorSize}
     '';
   in {
     home-manager.users.${username} = {
