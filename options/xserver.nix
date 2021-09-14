@@ -27,22 +27,30 @@ in {
   };
 
   config = (mkIf cfg.cursor.enable (let
+    sizeStr = builtins.toString cfg.cursor.size;
     gtkCursorTheme = ''gtk-cursor-theme-name="${cfg.cursor.theme}"'';
-    gtkCursorSize = "gtk-cursor-theme-size=${builtins.toString cfg.cursor.size}";
+    gtkCursorSize = "gtk-cursor-theme-size=${sizeStr}";
     gtkCommand = ''
       ${gtkCursorTheme}
       ${gtkCursorSize}
     '';
   in {
+    # TODO: Handle option for disabling theme
     home-manager.users.${username} = {
       home.packages = with pkgs; [ cfg.cursor.package ];
 
       home.sessionVariables = {
-        XCURSOR_SIZE = "${builtins.toString cfg.cursor.size}";
+        XCURSOR_SIZE = "${sizeStr}";
         XCURSOR_THEME = "${cfg.cursor.theme}";
       };
 
       home.file = {
+        ".Xresources" = {
+          text = ''
+            Xcursor.size: ${sizeStr}
+            Xcursor.theme: ${cfg.cursor.theme}
+          '';
+        };
         ".icons/default" = {
           source = "${cfg.cursor.package}/share/icons/${cfg.cursor.theme}";
         };
@@ -51,6 +59,10 @@ in {
       };
 
       xdg.configFile = { "gtk-3.0/setting.ini" = { text = gtkCommand; }; };
+
+      xsession.initExtra = "${
+          config.lib.custom.getExecPath pkgs.xorg.xrdb
+        } -merge $HOME/.Xresources";
     };
   }));
 }
