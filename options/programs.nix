@@ -26,20 +26,20 @@ in {
         home.packages = [ cfg.direnv.package ];
       };
 
-      dotfiles.terminal.shell = (mkMerge [
-        (mkIf (shellCfg.package.pname == "zsh") {
-          init = ''
-            eval "$(${
-              config.lib.custom.getBinPath cfg.direnv.package
-            } hook zsh)"'';
-        })
-        (mkIf (shellCfg.package.pname == "nushell") {
-          init = ''
-            eval "$(${
-              config.lib.custom.getBinPath cfg.direnv.package
-            } hook zsh)"'';
-        })
-      ]);
+      # dotfiles.terminal.shell = (mkMerge [
+        # (mkIf (shellCfg.package.pname == "zsh") {
+          # init = ''
+            # eval "$(${
+              # config.lib.custom.getBinPath cfg.direnv.package
+            # } hook zsh)"'';
+        # })
+        # (mkIf (shellCfg.package.pname == "nushell") {
+          # init = ''
+            # eval "$(${
+              # config.lib.custom.getBinPath cfg.direnv.package
+            # } hook zsh)"'';
+        # })
+      # ]);
     })
 
     (mkIf cfg.zoxide.enable {
@@ -47,16 +47,16 @@ in {
         home.packages = [ cfg.zoxide.package ];
       };
 
-      dotfiles.terminal.shell = (mkMerge [
-        (mkIf (shellCfg.package.pname == "zsh") {
-          init = ''
-            eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
-        })
-        (mkIf (shellCfg.package.pname == "nushell") {
-          init = ''
-            eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
-        })
-      ]);
+      # dotfiles.terminal.shell = (mkMerge [
+        # (mkIf (shellCfg.package.pname == "zsh") {
+          # init = ''
+            # eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+        # })
+        # (mkIf (shellCfg.package.pname == "nushell") {
+          # init = ''
+            # eval "$(${config.lib.custom.getBinPath cfg.zoxide.package} zsh)"'';
+        # })
+      # ]);
     })
   ]);
 }
