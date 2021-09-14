@@ -28,7 +28,7 @@ in {
 
   config = (mkIf cfg.cursor.enable (let
     gtkCursorTheme = ''gtk-cursor-theme-name="${cfg.cursor.theme}"'';
-    gtkCursorSize = "gtk-cursor-theme-size=${cfg.cursor.size}";
+    gtkCursorSize = "gtk-cursor-theme-size=${builtins.toString cfg.cursor.size}";
     gtkCommand = ''
       ${gtkCursorTheme}
       ${gtkCursorSize}
@@ -38,7 +38,7 @@ in {
       home.packages = with pkgs; [ cfg.cursor.package ];
 
       home.sessionVariables = {
-        XCURSOR_SIZE = "${cfg.cursor.size}";
+        XCURSOR_SIZE = "${builtins.toString cfg.cursor.size}";
         XCURSOR_THEME = "${cfg.cursor.theme}";
       };
 
