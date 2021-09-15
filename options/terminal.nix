@@ -25,6 +25,7 @@ let
   shellDefaultConfig = {
     enable = false;
     aliases = { };
+    variables = { };
     init = "";
     # package = pkgs.zsh;
     # configPath = ../dotfiles/.zshrc;
@@ -66,6 +67,10 @@ in {
           aliases = mkOption {
             description = "Shell aliases that will be used by all shells";
             type = types.attrsOf types.str;
+          };
+          variables = mkOption {
+            description = "Environment variables";
+            type = types.attrs;
           };
           init = mkOption {
             type = types.lines;
@@ -145,14 +150,32 @@ in {
           aliasList = (mapAttrsToList (k: v: "alias ${k}=${escapeShellArg v}")
             cfg.shell.aliases);
         in mkMerge [
-          (mkIf (cfg.shell.package.pname == "zsh") {
+          (mkIf (cfg.shell.package.pname == "zsh") (let
+            # Helper function taken from home-manager
+            toZshValue = v:
+              if builtins.isBool v then
+                if v then "true" else "false"
+              else if builtins.isString v then
+                ''"${v}"''
+              else if builtins.isList v then
+                "(${lib.concatStringsSep " " (map toZshValue v)})"
+              else
+                ''"${toString v}"'';
+
+            define = n: v: "${n}=${toZshValue v}";
+
+            export = n: v: "export ${define n v}";
+
+            variableList = (mapAttrsToList export cfg.shell.variables);
+          in {
             ".zshrc" = {
               text = (builtins.readFile cfg.shell.configPath) + ''
                 ${(concatStringsSep "\n" aliasList)}
+                ${(concatStringsSep "\n" variableList)}
                 ${cfg.shell.init}
               '';
             };
-          })
+          }))
         ];
 
         xdg.configFile = let
@@ -160,7 +183,8 @@ in {
           nushellExtra = {
             startup =
               (mapAttrsToList (k: v: "alias ${k} = ${v}") cfg.shell.aliases);
-              # ++ initCommands;
+            # ++ initCommands;
+            env = cfg.shell.variables;
           };
         in mkMerge [
           (mkIf (cfg.shell.package.pname == "nushell") {
