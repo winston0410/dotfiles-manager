@@ -39,11 +39,6 @@ in {
     home-manager.users.${username} = {
       home.packages = with pkgs; [ cfg.cursor.package ];
 
-      home.sessionVariables = {
-        XCURSOR_SIZE = "${sizeStr}";
-        XCURSOR_THEME = "${cfg.cursor.theme}";
-      };
-
       home.file = {
         ".Xresources" = {
           text = ''
@@ -63,6 +58,11 @@ in {
       xsession.initExtra = "${
           config.lib.custom.getExecPath pkgs.xorg.xrdb
         } -merge $HOME/.Xresources";
+    };
+
+    dotfiles.terminal.shell.variables = {
+      XCURSOR_SIZE = "${sizeStr}";
+      XCURSOR_THEME = "${cfg.cursor.theme}";
     };
   }));
 }
