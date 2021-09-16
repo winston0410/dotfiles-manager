@@ -16,7 +16,9 @@ let
   };
 in {
   options.dotfiles.programs = {
-    direnv = (programOptions "direnv");
+    direnv = ((programOptions "direnv") {
+      nix-direnv = { enable = mkEnableOption "nix-direnv"; };
+    });
     zoxide = (programOptions "zoxide");
   };
 
@@ -29,25 +31,24 @@ in {
           } hook zsh)"'';
       };
     in {
-      home-manager.users.${username} = let
-        isNixDirenv = cfg.direnv.package.pname == "nix-direnv";
-        direnvPackage = if isNixDirenv then
-          cfg.direnv.package.override { enableFlakes = true; }
-        else
-          cfg.direnv.package;
-      in {
-        home.packages = [ direnvPackage ];
+      home-manager.users.${username} =
+        let useNixDirenv = cfg.direnv.nix-direnv.enable;
+        in {
+          home.packages = [
+            cfg.direnv.package
+            (mkIf (true) pkgs.nix-direnv.override { enableFlakes = true; })
+          ];
 
-        xdg.configFile = mkMerge [
-          (mkIf (isNixDirenv) {
-            "direnv/direnvrc" = {
-              text = "source ${cfg.direnv.package}/share/nix-direnv/direnvrc";
-            };
-          })
-        ];
-      };
+          xdg.configFile = mkMerge [
+            (mkIf (useNixDirenv) {
+              "direnv/direnvrc" = {
+                text = "source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
+              };
+            })
+          ];
+        };
 
-      nix = (mkIf (isNixDirenv) {
+      nix = (mkIf (useNixDirenv) {
         extraOptions = ''
           keep-outputs = true
           keep-derivations = true
