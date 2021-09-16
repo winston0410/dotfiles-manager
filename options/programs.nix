@@ -35,13 +35,15 @@ in {
 
       dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
 
-      xdg.configFile = mkMerge [
-        (mkIf (cfg.direnv.package.pname == "nix-direnv") {
-          "direnv/direnvrc" = {
-            text = "${cfg.direnv.package}/share/nix-direnv/direnvrc";
-          };
-        })
-      ];
+      home-manager.users.${username} = {
+        xdg.configFile = mkMerge [
+          (mkIf (cfg.direnv.package.pname == "nix-direnv") {
+            "direnv/direnvrc" = {
+              text = "${cfg.direnv.package}/share/nix-direnv/direnvrc";
+            };
+          })
+        ];
+      };
     }))
 
     (mkIf cfg.zoxide.enable (let
