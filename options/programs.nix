@@ -31,24 +31,22 @@ in {
           } hook zsh)"'';
       };
     in {
-      home-manager.users.${username} =
-        let useNixDirenv = cfg.direnv.nix-direnv.enable;
-        in {
-          home.packages = [
-            cfg.direnv.package
-            (mkIf (true) pkgs.nix-direnv.override { enableFlakes = true; })
-          ];
+      home-manager.users.${username} = {
+        home.packages = [
+          cfg.direnv.package
+          (mkIf (true) pkgs.nix-direnv.override { enableFlakes = true; })
+        ];
 
-          xdg.configFile = mkMerge [
-            (mkIf (useNixDirenv) {
-              "direnv/direnvrc" = {
-                text = "source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
-              };
-            })
-          ];
-        };
+        xdg.configFile = mkMerge [
+          (mkIf (cfg.direnv.nix-direnv.enable) {
+            "direnv/direnvrc" = {
+              text = "source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
+            };
+          })
+        ];
+      };
 
-      nix = (mkIf (useNixDirenv) {
+      nix = (mkIf (cfg.direnv.nix-direnv.enable) {
         extraOptions = ''
           keep-outputs = true
           keep-derivations = true
