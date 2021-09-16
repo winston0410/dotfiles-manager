@@ -31,11 +31,7 @@ in {
     in {
       home-manager.users.${username} = {
         home.packages = [ cfg.direnv.package ];
-      };
 
-      dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
-
-      home-manager.users.${username} = {
         xdg.configFile = mkMerge [
           (mkIf (cfg.direnv.package.pname == "nix-direnv") {
             "direnv/direnvrc" = {
@@ -44,6 +40,8 @@ in {
           })
         ];
       };
+
+      dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
     }))
 
     (mkIf cfg.zoxide.enable (let
