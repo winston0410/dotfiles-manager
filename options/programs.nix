@@ -32,10 +32,9 @@ in {
       };
     in {
       home-manager.users.${username} = {
-        home.packages = [
-          cfg.direnv.package
-          (mkIf (true) pkgs.nix-direnv.override { enableFlakes = true; })
-        ];
+        home.packages = [ cfg.direnv.package ]
+          ++ (lib.lists.optional cfg.direnv.nix-direnv.enable
+            (pkgs.nix-direnv.override { enableFlakes = true; }));
 
         xdg.configFile = mkMerge [
           (mkIf (cfg.direnv.nix-direnv.enable) {
