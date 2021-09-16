@@ -6,6 +6,13 @@ with lib;
 let cfg = config.dotfiles.xserver;
 in {
   options.dotfiles.xserver = {
+    bar = {
+      enable = mkEnableOption "Bar configuration";
+      package = mkOption {
+        type = types.package;
+        description = "Default package for bar";
+      };
+    };
     cursor = {
       enable = mkEnableOption "Cursor configuration for gtk and x";
       size = mkOption {
