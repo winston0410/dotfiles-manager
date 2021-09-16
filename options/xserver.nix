@@ -33,43 +33,49 @@ in {
     };
   };
 
-  config = (mkIf cfg.cursor.enable (let
-    sizeStr = builtins.toString cfg.cursor.size;
-    gtkCursorTheme = ''gtk-cursor-theme-name="${cfg.cursor.theme}"'';
-    gtkCursorSize = "gtk-cursor-theme-size=${sizeStr}";
-    gtkCommand = ''
-      ${gtkCursorTheme}
-      ${gtkCursorSize}
-    '';
-  in {
-    # TODO: Handle option for disabling theme
-    home-manager.users.${username} = {
-      home.packages = with pkgs; [ cfg.cursor.package ];
+  config = (mkMerge [
+    (mkIf cfg.cursor.enable (let
+      sizeStr = builtins.toString cfg.cursor.size;
+      gtkCursorTheme = ''gtk-cursor-theme-name="${cfg.cursor.theme}"'';
+      gtkCursorSize = "gtk-cursor-theme-size=${sizeStr}";
+      gtkCommand = ''
+        ${gtkCursorTheme}
+        ${gtkCursorSize}
+      '';
+    in {
+      # TODO: Handle option for disabling theme
+      home-manager.users.${username} = {
+        home.packages = with pkgs; [ cfg.cursor.package ];
 
-      home.file = {
-        ".Xresources" = {
-          text = ''
-            Xcursor.size: ${sizeStr}
-            Xcursor.theme: ${cfg.cursor.theme}
-          '';
-        };
-        ".icons/default" = {
-          source = "${cfg.cursor.package}/share/icons/${cfg.cursor.theme}";
+        home.file = {
+          ".Xresources" = {
+            text = ''
+              Xcursor.size: ${sizeStr}
+              Xcursor.theme: ${cfg.cursor.theme}
+            '';
+          };
+          ".icons/default" = {
+            source = "${cfg.cursor.package}/share/icons/${cfg.cursor.theme}";
+          };
+
+          ".gtkrc-2.0" = { text = gtkCommand; };
         };
 
-        ".gtkrc-2.0" = { text = gtkCommand; };
+        xdg.configFile = { "gtk-3.0/setting.ini" = { text = gtkCommand; }; };
+
+        xsession.initExtra = "${
+            config.lib.custom.getExecPath pkgs.xorg.xrdb
+          } -merge $HOME/.Xresources";
       };
 
-      xdg.configFile = { "gtk-3.0/setting.ini" = { text = gtkCommand; }; };
+      dotfiles.terminal.shell.variables = {
+        XCURSOR_SIZE = "${sizeStr}";
+        XCURSOR_THEME = "${cfg.cursor.theme}";
+      };
+    }))
 
-      xsession.initExtra = "${
-          config.lib.custom.getExecPath pkgs.xorg.xrdb
-        } -merge $HOME/.Xresources";
-    };
-
-    dotfiles.terminal.shell.variables = {
-      XCURSOR_SIZE = "${sizeStr}";
-      XCURSOR_THEME = "${cfg.cursor.theme}";
-    };
-  }));
+    (mkIf cfg.bar.enable {
+        home.packages = with pkgs; [ cfg.bar.package ];
+    })
+  ]);
 }
