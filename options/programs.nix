@@ -16,7 +16,7 @@ let
   };
 in {
   options.dotfiles.programs = {
-    direnv = ((programOptions "direnv") {
+    direnv = (lib.attrsets.recursiveUpdate (programOptions "direnv") {
       nix-direnv = { enable = mkEnableOption "nix-direnv"; };
     });
     zoxide = (programOptions "zoxide");
