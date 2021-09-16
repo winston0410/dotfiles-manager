@@ -29,17 +29,30 @@ in {
           } hook zsh)"'';
       };
     in {
-      home-manager.users.${username} = {
-        home.packages = [ cfg.direnv.package ];
+      home-manager.users.${username} = let
+        isNixDirenv = cfg.direnv.package.pname == "nix-direnv";
+        direnvPackage = if isNixDirenv then
+          cfg.direnv.package.override { enableFlakes = true; }
+        else
+          cfg.direnv.package;
+      in {
+        home.packages = [ direnvPackage ];
 
         xdg.configFile = mkMerge [
-          (mkIf (cfg.direnv.package.pname == "nix-direnv") {
+          (mkIf (isNixDirenv) {
             "direnv/direnvrc" = {
               text = "${cfg.direnv.package}/share/nix-direnv/direnvrc";
             };
           })
         ];
       };
+
+      nix = (mkIf (isNixDirenv) {
+        extraOptions = ''
+          keep-outputs = true
+          keep-derivations = true
+        '';
+      });
 
       dotfiles.terminal.shell.init = configDict.${shellCfg.package.pname};
     }))
