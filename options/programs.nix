@@ -41,7 +41,7 @@ in {
         xdg.configFile = mkMerge [
           (mkIf (isNixDirenv) {
             "direnv/direnvrc" = {
-              text = "${cfg.direnv.package}/share/nix-direnv/direnvrc";
+              text = "source ${cfg.direnv.package}/share/nix-direnv/direnvrc";
             };
           })
         ];
