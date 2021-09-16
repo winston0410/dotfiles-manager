@@ -75,7 +75,9 @@ in {
     }))
 
     (mkIf cfg.bar.enable {
+      home-manager.users.${username} = {
         home.packages = with pkgs; [ cfg.bar.package ];
+      };
     })
   ]);
 }
