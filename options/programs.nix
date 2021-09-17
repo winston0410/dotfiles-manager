@@ -32,14 +32,14 @@ in {
       };
     in {
       home-manager.users.${username} = {
-        home.packages = [ cfg.direnv.package ]
-          ++ (lib.lists.optional cfg.direnv.nix-direnv.enable
-            (pkgs.nix-direnv.override { enableFlakes = true; }));
+        home.packages = [ cfg.direnv.package ];
 
         xdg.configFile = mkMerge [
           (mkIf (cfg.direnv.nix-direnv.enable) {
             "direnv/direnvrc" = {
-              text = "source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
+              text = "source ${
+                  pkgs.nix-direnv.override { enableFlakes = true; }
+                }/share/nix-direnv/direnvrc";
             };
           })
         ];
