@@ -28,7 +28,7 @@ in {
     };
   };
 
-  config = mkIf networking.networkmanager.enable {
+  config = mkIf config.networking.networkmanager.enable {
     environment.etc = (mkIf cfg.profiles != { } {
 
     });
