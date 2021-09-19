@@ -28,8 +28,8 @@ in {
     };
   };
 
-  config = mkIf config.networking.networkmanager.enable {
-    environment.etc = (mkIf cfg.profiles != { } {
+  config = mkIf (config.networking.networkmanager.enable) {
+    environment.etc = (mkIf (cfg.profiles != { }) {
 
     });
   };
