@@ -10,22 +10,23 @@
   };
 
   outputs = { self, nixpkgs, home-manager, ... }: rec {
-    lib = {
-      # username as last argument for easier partial application
-      mkProfile = { modules, username }:
+    lib = let mkOverridable = nixpkgs.lib.makeOverridable;
+    in {
+      mkProfile = mkOverridable (modules: username:
         let list = (builtins.map (m: (m username)) modules);
         in {
           imports = [ ((import ./options.nix) username) ] ++ list;
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-        };
+        });
 
-      mkSystem = { system, inputs, username, modules }:
+      mkSystem = mkOverridable ({ system, inputs, modules }:
         inputs.nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (self.lib.mkProfile { inherit modules username; }) ];
+          modules = [ inputs.home-manager.nixosModules.home-manager ]
+            ++ modules;
           specialArgs = { inherit inputs; };
-        };
+        });
     };
 
     options = import ./options.nix;
