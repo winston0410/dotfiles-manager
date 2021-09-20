@@ -21,7 +21,7 @@
         };
 
       mkSystem = { system, inputs, username, modules }:
-        pkgs.lib.nixosSystem {
+        inputs.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ (self.lib.mkProfile { inherit modules username; }) ];
           specialArgs = { inherit inputs; };
