@@ -22,14 +22,14 @@ let
 in {
   options.dotfiles.network-manager = {
     profiles = mkOption {
-      type = types.attrsOf networkProfile;
+      type = types.listOf networkProfile;
       description = "Profiles for network connection";
       default = { };
     };
   };
 
   config = mkIf (config.networking.networkmanager.enable) {
-    environment.etc = (mkIf (cfg.profiles != { }) {
+    environment.etc = (mkIf (cfg.profiles != []) {
 
     });
   };

@@ -9,17 +9,22 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }: rec {
+  outputs = { self, nixpkgs, home-manager, ... }: rec {
     lib = {
       # username as last argument for easier partial application
-      createProfile = moduleList: username:
-        let list = (builtins.map (m: (m username)) moduleList);
+      mkProfile = { modules, username }:
+        let list = (builtins.map (m: (m username)) modules);
         in {
-          imports = [
-            ((import ./options.nix) username)
-          ] ++ list;
+          imports = [ ((import ./options.nix) username) ] ++ list;
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+        };
+
+      mkSystem = { system, inputs, username, modules }:
+        pkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ (self.lib.mkProfile { inherit modules username; }) ];
+          specialArgs = { inherit inputs; };
         };
     };
 
