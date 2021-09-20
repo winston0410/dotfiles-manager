@@ -12,13 +12,13 @@
   outputs = { self, nixpkgs, home-manager, ... }: rec {
     lib = let mkOverridable = nixpkgs.lib.makeOverridable;
     in {
-      mkProfile = mkOverridable (modules: username:
+      mkProfile = modules: username:
         let list = (builtins.map (m: (m username)) modules);
         in {
           imports = [ ((import ./options.nix) username) ] ++ list;
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-        });
+        };
 
       mkSystem = mkOverridable ({ system, inputs, modules }:
         inputs.nixpkgs.lib.nixosSystem {
