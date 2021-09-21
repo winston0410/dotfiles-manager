@@ -23,7 +23,7 @@
           (builtins.removeAttrs newArgs [ "modules" ]));
 
     in {
-      mkProfile = modules: username:
+      mkProfile = { modules }: username:
         let list = (builtins.map (m: (m username)) modules);
         in {
           imports = [ ((import ./options.nix) username) ] ++ list;
