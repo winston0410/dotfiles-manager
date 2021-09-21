@@ -11,18 +11,14 @@
 
   outputs = { self, nixpkgs, home-manager, ... }: rec {
     lib = let
-      # Handle merging logic later
-      callback = name: vals: vals;
-
       mkExtendable = f: origArgs:
         let attrKeys = builtins.attrNames origArgs;
-        in ((f origArgs) // {
+        in (
+        # Use shallow merge as only adding the extend function there
+        # Handle later
+        (f origArgs) // {
           extend = newArgs:
-            (mkExtendable f
-              (nixpkgs.lib.attrsets.zipAttrsWithNames attrKeys callback [
-                origArgs
-                newArgs
-              ]));
+            (mkExtendable f newArgs);
         });
     in {
       mkProfile = modules: username:
