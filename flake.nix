@@ -32,8 +32,7 @@
       mkSystem = mkExtendable ({ system, inputs, modules, extraModules ? [ ] }:
         inputs.nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ inputs.home-manager.nixosModules.home-manager ]
-            ++ extraModules;
+          modules = modules ++ extraModules;
           specialArgs = { inherit inputs; };
         });
     };
