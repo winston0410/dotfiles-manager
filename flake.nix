@@ -10,7 +10,20 @@
   };
 
   outputs = { self, nixpkgs, home-manager, ... }: rec {
-    lib = let mkOverridable = nixpkgs.lib.makeOverridable;
+    lib = let
+      # Handle merging logic later
+      callback = name: vals: vals;
+
+      mkExtendable = f: origArgs:
+        let attrKeys = builtins.attrNames origArgs;
+        in ((f origArgs) // {
+          extend = newArgs:
+            (mkExtendable f
+              (nixpkgs.lib.attrsets.zipAttrsWithNames attrKeys callback [
+                origArgs
+                newArgs
+              ]));
+        });
     in {
       mkProfile = modules: username:
         let list = (builtins.map (m: (m username)) modules);
@@ -20,7 +33,7 @@
           home-manager.useUserPackages = true;
         };
 
-      mkSystem = mkOverridable ({ system, inputs, modules }:
+      mkSystem = mkExtendable ({ system, inputs, modules }:
         inputs.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ inputs.home-manager.nixosModules.home-manager ]
