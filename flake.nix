@@ -11,15 +11,17 @@
 
   outputs = { self, nixpkgs, home-manager, ... }: rec {
     lib = let
-      mkExtendable = f: origArgs:
-        let attrKeys = builtins.attrNames origArgs;
-        in (
-          # Work around with extraModules right now
-          (f origArgs) // {
-            extend = newArgs:
-              (mkExtendable f
-                (nixpkgs.lib.attrsets.recursiveUpdate origArgs newArgs));
-          });
+      # mkExtendable = f: origArgs:
+      # ((f origArgs) // {
+      # extend = newArgs:
+      # (mkExtendable f
+      # (nixpkgs.lib.attrsets.recursiveUpdate origArgs newArgs));
+      # });
+
+      mkExtendable = f: origArgs: newArgs:
+        f (nixpkgs.lib.attrsets.recursiveUpdate origArgs
+          (builtins.removeAttrs newArgs [ "modules" ]));
+
     in {
       mkProfile = modules: username:
         let list = (builtins.map (m: (m username)) modules);
