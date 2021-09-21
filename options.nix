@@ -8,7 +8,7 @@ with lib;
     ./options/terminal.nix
     ./options/programs.nix
     ./options/xserver.nix
-    ./options/network-manager.nix
+    # ./options/network-manager.nix
   ] (module: (import module) username));
 
   config.lib.custom = let
