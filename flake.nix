@@ -14,12 +14,12 @@
       mkExtendable = f: origArgs:
         let attrKeys = builtins.attrNames origArgs;
         in (
-        # Use shallow merge as only adding the extend function there
-        # Handle later
-        (f origArgs) // {
-          extend = newArgs:
-            (mkExtendable f newArgs);
-        });
+          # Work around with extraModules right now
+          (f origArgs) // {
+            extend = newArgs:
+              (mkExtendable f
+                (nixpkgs.lib.attrsets.recursiveUpdate origArgs newArgs));
+          });
     in {
       mkProfile = modules: username:
         let list = (builtins.map (m: (m username)) modules);
@@ -29,11 +29,11 @@
           home-manager.useUserPackages = true;
         };
 
-      mkSystem = mkExtendable ({ system, inputs, modules }:
+      mkSystem = mkExtendable ({ system, inputs, modules, extraModules ? [ ] }:
         inputs.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ inputs.home-manager.nixosModules.home-manager ]
-            ++ modules;
+            ++ extraModules;
           specialArgs = { inherit inputs; };
         });
     };
