@@ -31,7 +31,15 @@
           home-manager.useUserPackages = true;
         };
 
-      mkSystem = mkExtendable ({ system, inputs, modules, extraModules ? [ ] }:
+      # mkSystem = mkExtendable
+      # ({ system, inputs, modules ? [ ], extraModules ? [ ] }:
+      # inputs.nixpkgs.lib.nixosSystem {
+      # inherit system;
+      # modules = modules ++ extraModules;
+      # specialArgs = { inherit inputs; };
+      # });
+
+      mkSystem = ({ system, inputs, modules ? [ ], extraModules ? [ ] }:
         inputs.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = modules ++ extraModules;
