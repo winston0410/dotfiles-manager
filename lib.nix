@@ -57,12 +57,18 @@ in {
         }));
 
   mkSystem = mkExtendable ({ system, inputs, modules ? { } }:
-    # TODO: assert no users.users config in modules in mkSystem
     let
       hasHm = (builtins.hasAttr "home-manager" inputs)
         || (builtins.hasAttr "hm" inputs);
+      injected = (builtins.map (m:
+        let
+          imported = if builtins.isPath m then (import m) inputs.nixpkgs else m;
+          checked = imported;
+        in (checked)) (toList modules));
+
     in (inputs.nixpkgs.lib.nixosSystem {
       inherit system;
+      # modules = (injected) ++ (inputs.nixpkgs.lib.optional hasHm
       modules = (toList modules) ++ (inputs.nixpkgs.lib.optional hasHm
         inputs.home-manager.nixosModules.home-manager);
       specialArgs = { inherit inputs system; };
