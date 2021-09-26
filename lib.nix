@@ -36,6 +36,23 @@ let
 
   toList = nixpkgs.lib.attrsets.mapAttrsToList (_: value: value);
 
+  mkSystem = mkExtendable ({ system, inputs, modules ? { } }:
+    let
+      hasHm = (builtins.hasAttr "home-manager" inputs)
+        || (builtins.hasAttr "hm" inputs);
+      injected = (builtins.map (m:
+        let
+          imported = if builtins.isPath m then (import m) inputs.nixpkgs else m;
+          checked = imported;
+        in (checked)) (toList modules));
+
+    in (inputs.nixpkgs.lib.nixosSystem {
+      inherit system;
+      # modules = (injected) ++ (inputs.nixpkgs.lib.optional hasHm
+      modules = (toList modules) ++ (inputs.nixpkgs.lib.optional hasHm
+        inputs.home-manager.nixosModules.home-manager);
+      specialArgs = { inherit inputs system; };
+    }));
 in {
   mkProfile = mkExtendable
     ({ modules ? { }, hmModules ? { }, namedModules ? { }, userProfile ? { } }:
@@ -56,21 +73,12 @@ in {
           };
         }));
 
-  mkSystem = mkExtendable ({ system, inputs, modules ? { } }:
-    let
-      hasHm = (builtins.hasAttr "home-manager" inputs)
-        || (builtins.hasAttr "hm" inputs);
-      injected = (builtins.map (m:
-        let
-          imported = if builtins.isPath m then (import m) inputs.nixpkgs else m;
-          checked = imported;
-        in (checked)) (toList modules));
+  inherit mkSystem;
 
-    in (inputs.nixpkgs.lib.nixosSystem {
-      inherit system;
-      # modules = (injected) ++ (inputs.nixpkgs.lib.optional hasHm
-      modules = (toList modules) ++ (inputs.nixpkgs.lib.optional hasHm
-        inputs.home-manager.nixosModules.home-manager);
-      specialArgs = { inherit inputs system; };
-    }));
+  mkSimpleSystem = mkExtendable
+    ({ system, inputs, modules ? { }, hostname ? "nixos" }: {
+      nixosConfigurations = {
+        ${hostname} = (mkSystem { inherit system inputs modules; });
+      };
+    });
 }
