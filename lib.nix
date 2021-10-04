@@ -54,24 +54,25 @@ let
       specialArgs = { inherit inputs system; };
     }));
 in {
-  mkProfile = mkExtendable
-    ({ modules ? { }, hmModules ? { }, namedModules ? { }, userProfile ? { } }:
-      # return an NixOS module to prevent leaking extend/override into configuration
-      ({ ... }:
-        let applyName = builtins.map (m: (m userProfile.name));
-        in {
-          imports = (toList modules)
-            ++ (nixpkgs.lib.trivial.pipe namedModules [ toList applyName ]);
-          # create user profile here
-          users.users.${userProfile.name} = userProfile;
+  mkProfile = mkExtendable ({ modules ? { }, hmModules ? { }, namedModules ? { }
+    , userProfile ? { }, specialArgs ? { } }:
+    # return an NixOS module to prevent leaking extend/override into configuration
+    ({ ... }:
+      let applyName = builtins.map (m: (m userProfile.name));
+      in {
+        imports = (toList modules)
+          ++ (nixpkgs.lib.trivial.pipe namedModules [ toList applyName ]);
+        # create user profile here
+        users.users.${userProfile.name} = userProfile;
 
-          # Handle home-manager modules
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.${userProfile.name} = {
-            imports = (toList hmModules);
-          };
-        }));
+        # Handle home-manager modules
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.extraSpecialArgs = specialArgs;
+        home-manager.users.${userProfile.name} = {
+          imports = (toList hmModules);
+        };
+      }));
 
   inherit mkSystem;
 
